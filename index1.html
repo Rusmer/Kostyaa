@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Костя лох — iOS 26 Liquid Glass</title>
+  <style>
+    :root {
+      --bg1: #0c1222;
+      --bg2: #111a33;
+      --accent1: #a0baff;
+      --accent2: #ff9fcb;
+      --glass: rgba(255,255,255,0.05);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.45);
+      --radius: 26px;
+      --blur: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; font-family: -apple-system, "SF Pro Display", Inter, Segoe UI, Roboto, sans-serif; }
+    body {
+      display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(at 20% 30%, rgba(160,180,255,0.1), transparent 50%),
+                  radial-gradient(at 80% 70%, rgba(255,180,220,0.08), transparent 50%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      color: var(--text);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .blob {
+      position: absolute; width: 100vmax; height: 100vmax;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: radial-gradient(circle at 30% 30%, var(--accent1), transparent 60%),
+                  radial-gradient(circle at 70% 70%, var(--accent2), transparent 60%);
+      filter: blur(80px) saturate(120%);
+      animation: blobMove 16s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes blobMove {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      100% { transform: translate(-48%, -52%) scale(1.05); }
+    }
+
+    .glass {
+      position: relative; z-index: 1;
+      padding: clamp(24px, 6vw, 60px);
+      border-radius: var(--radius);
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(var(--blur)) saturate(140%);
+      -webkit-backdrop-filter: blur(var(--blur)) saturate(140%);
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.45), inset 0 1px rgba(255,255,255,0.05);
+      animation: fadeIn 1s cubic-bezier(.2,.9,.2,1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    h1 {
+      font-size: clamp(48px, 10vw, 120px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin: 0;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+    }
+
+    h1::after {
+      content: "";
+      position: absolute; top: 10%; left: 50%; width: 60%; height: 35%;
+      background: linear-gradient(90deg, rgba(255,255,255,0.2), transparent);
+      transform: translateX(-50%) rotate(-10deg);
+      filter: blur(18px);
+      mix-blend-mode: overlay;
+      border-radius: 50%;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      font-size: 15px;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+    }
+
+    .controls {
+      margin-top: 24px;
+      display: flex; justify-content: center; gap: 10px;
+    }
+
+    button {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: all 0.2s ease;
+    }
+
+    button:hover { color: #fff; background: rgba(255,255,255,0.12); }
+    button:active { transform: translateY(1px); }
+
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: #fff; padding: 8px 14px; border-radius: 10px;
+      font-size: 14px;
+      opacity: 0; transition: opacity 0.4s ease;
+      z-index: 10;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="blob"></div>
+  <div class="glass">
+    <h1 id="title">Костя не лох</h1>
+    <div class="subtitle">iOS 26 · Liquid Glass · Ultra Smooth</div>
+    <div class="controls">
+      <button onclick="copyText()">📋 Копировать</button>
+      <button onclick="toggleTheme()">☀️ Тема</button>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const root = document.documentElement;
+    let dark = true;
+
+    function copyText() {
+      navigator.clipboard.writeText(document.getElementById("title").textContent.trim())
+        .then(() => showToast("Скопировано!"))
+        .catch(() => showToast("Ошибка копирования"));
+    }
+
+    function toggleTheme() {
+      dark = !dark;
+      if (dark) {
+        root.style.setProperty("--bg1", "#0c1222");
+        root.style.setProperty("--bg2", "#111a33");
+        root.style.setProperty("--text", "#fff");
+        root.style.setProperty("--muted", "rgba(255,255,255,0.45)");
+      } else {
+        root.style.setProperty("--bg1", "#f6f8ff");
+        root.style.setProperty("--bg2", "#e6ecff");
+        root.style.setProperty("--text", "#111");
+        root.style.setProperty("--muted", "rgba(0,0,0,0.45)");
+      }
+      showToast(dark ? "Тёмная тема" : "Светлая тема");
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2000);
+    }
+  </script>
+</body>
+</html>
